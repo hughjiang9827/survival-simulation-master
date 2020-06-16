@@ -20,7 +20,7 @@ source(here("Moss-simulation-master/do_once.R"))
 
 # TODO: check
 set.seed(42)
-N_SIMULATION <- 5
+N_SIMULATION <- 80
 n_sim_grid <- c(1e2)
 # n_sim_grid <- c(1e3, 1e2)
 # n_sim_grid <- c(1e3, 5e2, 1e2)
