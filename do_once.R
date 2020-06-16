@@ -190,7 +190,7 @@ do_once <- function(n_sim = 2e2) {
   moss_hazard_l1 <- moss_hazard_l2$clone(deep = TRUE)
   # TODO: check
   moss_l2_1_rs <- moss_hazard_l2$iterate_onestep(
-    method = "l2", epsilon = 1e-1 / sqrt(n_sim), max_num_interation = 1e2, verbose = FALSE
+    method = "l2", epsilon = 1e-1 / sqrt(n_sim), max_num_interation = 5e1, verbose = FALSE
   )
   psi_moss_l2_1 <- moss_l2_1_rs$psi_n
   mean_eic_inner_product_moss_l2_1 <- min(moss_l2_1_rs$eic_list)
@@ -282,7 +282,7 @@ do_once <- function(n_sim = 2e2) {
   #     maxit = 5e1, 
   #     fit_method = "classic")
   up <- tmle3_Update$new(constrain_step = TRUE, one_dimensional = TRUE, 
-                       delta_epsilon = 3e-2, verbose = TRUE,
+                       delta_epsilon = 3e-2, verbose = FALSE,
                        convergence_type = "scaled_var", maxit = 5e1)
   targeted_likelihood <- Targeted_Likelihood$new(initial_likelihood, updater = up)
   # targeted_likelihood <- Targeted_Likelihood$new(initial_likelihood)
@@ -298,6 +298,8 @@ do_once <- function(n_sim = 2e2) {
   pN1_mat <- ps$long_to_mat(pN1,id,time)
   SN1_mat <- ps$hm_to_sm(pN1_mat)
   psi_tl_initial <- colMeans(SN1_mat)
+  # TODO : check
+  psi_tl_initial <- c(1, psi_tl_initial[seq(1, length(psi_tl_initial) - 1)])
   psi_tl_initial <- survival_curve$new(t = k_grid, survival = psi_tl_initial)
 
   tmle_fit_manual <- fit_tmle3(
@@ -306,6 +308,8 @@ do_once <- function(n_sim = 2e2) {
   )
   rs <- tmle_fit_manual$estimates[[1]]
   psi1_tl <- rs$psi
+  # TODO : check
+  psi1_tl <- c(1, psi1_tl[seq(1, length(psi1_tl) - 1)])
   psi1_tl <- survival_curve$new(t = k_grid, survival = psi1_tl)
 
   # TODO : check
@@ -343,6 +347,8 @@ do_once <- function(n_sim = 2e2) {
   print("--------------")
   rs <- tmle_fit_manual$estimates[[1]]
   psi_tl_l2 <- rs$psi
+  # TODO : check
+  psi_tl_l2 <- c(1, psi_tl_l2[seq(1, length(psi_tl_l2) - 1)])
   psi_tl_l2 <- survival_curve$new(t = k_grid, survival = psi_tl_l2)
 
   eic_tl_l2 <- rs$IC
