@@ -6,8 +6,10 @@ simulate_data <- function(n_sim = 2e2) {
     node("W", distr = "runif", min = 0, max = 1.5) +
     node("A", distr = "rbinom", size = 1, prob = .15 + .5 * as.numeric(W > .75)) +
     node("Trexp", distr = "rexp", rate = 1 + .7 * W^2 - .8 * A) +
+    node("Trexp1", distr = "rexp", rate = 1 + .7 * W^2 - .8 * 1) +
     node("Cweib", distr = "rweibull", shape = 1 + .5 * W, scale = 75) +
     node("T", distr = "rconst", const = round(Trexp * 2)) +
+    node("T1", distr = "rconst", const = round(Trexp1 * 2)) +
     node("C", distr = "rconst", const = round(Cweib * 2)) +
     # Observed random variable (follow-up time):
     node("T.tilde", distr = "rconst", const = ifelse(T <= C, T, C)) +
@@ -17,7 +19,7 @@ simulate_data <- function(n_sim = 2e2) {
   dat <- sim(setD, n = n_sim)
   # only grab ID, W's, A, T.tilde, Delta
   Wname <- grep("W", colnames(dat), value = TRUE)
-  dat <- dat[, c("ID", Wname, "A", "T.tilde", "Delta")]
+  dat <- dat[, c("ID", Wname, "A", "T","T1","T.tilde", "Delta")]
   # input: scalar q, W vector. computes for all W, the S(q|A,W)
   true_surv_one <- function(q, W, A = 1) sapply(W, function(w) {
       1 - pexp(q, rate = 1 + .7 * w^2 - .8 * A)
