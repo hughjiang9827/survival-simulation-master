@@ -283,7 +283,8 @@ do_once <- function(n_sim = 2e2) {
   #     fit_method = "classic")
   up <- tmle3_Update$new(constrain_step = TRUE, one_dimensional = TRUE, 
                        delta_epsilon = 3e-2, verbose = FALSE,
-                       convergence_type = "scaled_var", maxit = 5e1)
+                       convergence_type = "scaled_var", 
+                       maxit = 5e1, use_best = TRUE)
   targeted_likelihood <- Targeted_Likelihood$new(initial_likelihood, updater = up)
   # targeted_likelihood <- Targeted_Likelihood$new(initial_likelihood)
   tmle_task <- survival_task
@@ -299,7 +300,7 @@ do_once <- function(n_sim = 2e2) {
   SN1_mat <- ps$hm_to_sm(pN1_mat)
   psi_tl_initial <- colMeans(SN1_mat)
   # TODO : check
-  psi_tl_initial <- c(1, psi_tl_initial[seq(1, length(psi_tl_initial) - 1)])
+  # psi_tl_initial <- c(1, psi_tl_initial[seq(1, length(psi_tl_initial) - 1)])
   psi_tl_initial <- survival_curve$new(t = k_grid, survival = psi_tl_initial)
 
   tmle_fit_manual <- fit_tmle3(
@@ -309,7 +310,7 @@ do_once <- function(n_sim = 2e2) {
   rs <- tmle_fit_manual$estimates[[1]]
   psi1_tl <- rs$psi
   # TODO : check
-  psi1_tl <- c(1, psi1_tl[seq(1, length(psi1_tl) - 1)])
+  # psi1_tl <- c(1, psi1_tl[seq(1, length(psi1_tl) - 1)])
   psi1_tl <- survival_curve$new(t = k_grid, survival = psi1_tl)
 
   # TODO : check
@@ -326,10 +327,11 @@ do_once <- function(n_sim = 2e2) {
     # one_dimensional = TRUE, constrain_step = TRUE,
     maxit = 5e1, 
     # cvtmle = TRUE,
-    # convergence_type = "sample_size",
+    convergence_type = "scaled_var",
     # delta_epsilon = 1e-2,
     fit_method = "l2",
-    clipping = 1e-2
+    clipping = 1e-2,
+    use_best = TRUE
   )
   targeted_likelihood <- Targeted_Likelihood$new(initial_likelihood, updater = up)
   # targeted_likelihood <- Targeted_Likelihood$new(initial_likelihood)
@@ -348,7 +350,7 @@ do_once <- function(n_sim = 2e2) {
   rs <- tmle_fit_manual$estimates[[1]]
   psi_tl_l2 <- rs$psi
   # TODO : check
-  psi_tl_l2 <- c(1, psi_tl_l2[seq(1, length(psi_tl_l2) - 1)])
+  # psi_tl_l2 <- c(1, psi_tl_l2[seq(1, length(psi_tl_l2) - 1)])
   psi_tl_l2 <- survival_curve$new(t = k_grid, survival = psi_tl_l2)
 
   eic_tl_l2 <- rs$IC
@@ -357,8 +359,11 @@ do_once <- function(n_sim = 2e2) {
   ################################################################################
 
   # evaluate against truth
-  survival_truth_1 <- survival_curve$new(t = k_grid, survival = simulated$true_surv1(k_grid - 1))
-  survival_truth_0 <- survival_curve$new(t = k_grid, survival = simulated$true_surv0(k_grid - 1))
+  # TODO: fix the truth
+  true_indx <- c(0, k_grid - 0.5)
+  true_indx <- true_indx[seq(1, length(true_indx) - 1)]
+  survival_truth_1 <- survival_curve$new(t = k_grid, survival = simulated$true_surv1(true_indx))
+  survival_truth_0 <- survival_curve$new(t = k_grid, survival = simulated$true_surv0(true_indx))
 
   # TODO: check
   evaluate_tlverse_initial <- evaluate_metric$new(
