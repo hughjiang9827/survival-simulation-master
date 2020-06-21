@@ -1,7 +1,8 @@
 library(tidyverse)
 library(ggpubr)
 
-load("./output/df_metric.rda")
+# load("./output/df_metric.rda")
+load("./moss-simulation-master/code_simulation/df_metric.rda")
 df_metric <- df_metric %>%
   filter(metric_name == "mse") %>%
   # TODO: check
@@ -38,6 +39,8 @@ df_mse <- df_metric %>%
     nrmse = rmse / truth,
     bias_percent = bias / truth
   )
+
+df_mse <- df_mse[df_mse$t<=10,]
 # TODO: check 
 # df_mse_tmle <- df_mse %>% filter(method == "iter. TMLE")
 df_mse_tmle <- df_mse %>% filter(method == "MOSS_l2")
