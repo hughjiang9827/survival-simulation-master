@@ -14,7 +14,7 @@ moss_estimates <- function(moss_fit){
   return(result)
 }
 
-format_results <- function(method,estimates, k_grid, n_t){
+format_results <- function(method,estimates, k_grid, n_t, steps=NA){
   ED <- colMeans(estimates$IC)
   ED2 <- colMeans(estimates$IC^2)
   results_df <- data.table(method = method,
@@ -22,7 +22,8 @@ format_results <- function(method,estimates, k_grid, n_t){
                            estimate = estimates$psi,
                            ED = ED,
                            ED2 = ED2,
-                           n_t=n_t)
+                           n_t=n_t,
+                           steps=steps)
 }
 
 do_once <- function(n_sim = 2e2) {
@@ -123,7 +124,7 @@ do_once <- function(n_sim = 2e2) {
   var_types <- list(T_tilde = Variable_Type$new("continuous"), t = Variable_Type$new("continuous"), 
                     Delta = Variable_Type$new("binomial"))
   survival_spec <- tmle_survival(treatment_level = 1, control_level = 0, 
-                                 target_times = intersect(1:10, k_grid),
+                                 # target_times = intersect(1:10, k_grid),
                                  variable_types = var_types)
   tmle_task <- survival_spec$make_tmle_task(df_long, node_list)
   
@@ -205,13 +206,12 @@ do_once <- function(n_sim = 2e2) {
   #     fit_method = "classic")
   up <- tmle3_Update$new(constrain_step = TRUE, one_dimensional = TRUE, 
                        delta_epsilon = 3e-2, verbose = FALSE,
-                       convergence_type = "scaled_var", 
+                       convergence_type = "scaled_var",
                        maxit = 1e2, use_best = TRUE)
   targeted_likelihood <- Targeted_Likelihood$new(initial_likelihood, updater = up)
   # targeted_likelihood <- Targeted_Likelihood$new(initial_likelihood)
   tmle_params <- survival_spec$make_params(tmle_task, targeted_likelihood)
 
-  # TODO: initial
   ps <- tmle_params[[1]]
   
   tmle_fit_manual <- fit_tmle3(
@@ -219,7 +219,7 @@ do_once <- function(n_sim = 2e2) {
     targeted_likelihood$updater
   )
   
-  tl_ulfs_results <- format_results("tmle3 ulfs", tmle_fit_manual$estimates[[1]], k_grid, n_t)
+  tl_ulfs_results <- format_results("tmle3 ulfs", tmle_fit_manual$estimates[[1]], k_grid, n_t, steps=tmle_fit_manual$steps)
 
 
   message("tlverse l2")
@@ -244,7 +244,7 @@ do_once <- function(n_sim = 2e2) {
     targeted_likelihood$updater
   )
   
-  tl_l2_results <- format_results("tmle3 l2", tmle_fit_manual$estimates[[1]], k_grid, n_t)
+  tl_l2_results <- format_results("tmle3 l2", tmle_fit_manual$estimates[[1]], k_grid, n_t, steps=tmle_fit_manual$steps)
   
   
   # evaluate against truth
