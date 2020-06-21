@@ -7,6 +7,7 @@ df_metric[,lower:=estimate-qnorm(0.975)*se_est]
 df_metric[,upper:=estimate+qnorm(0.975)*se_est]
 df_metric[,coverage:=between(true_surv,lower,upper)]
 df_metric[,ci_length:=upper-lower]
+ggplot(df_metric[!is.na(steps)&t==1],aes(x=steps))+geom_histogram()+facet_wrap(~method)
 perf <- df_metric[t%in%t_range,list(mean_est=mean(estimate),
                                     true_surv=mean(true_surv),
                                     mse = mean((estimate-true_surv)^2),

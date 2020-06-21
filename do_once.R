@@ -206,6 +206,7 @@ do_once <- function(n_sim = 2e2) {
   #     fit_method = "classic")
   up <- tmle3_Update$new(constrain_step = TRUE, one_dimensional = TRUE, 
                        delta_epsilon = 3e-2, verbose = FALSE,
+                       cvtmle = FALSE,
                        convergence_type = "scaled_var",
                        maxit = 1e2, use_best = TRUE)
   targeted_likelihood <- Targeted_Likelihood$new(initial_likelihood, updater = up)
@@ -229,12 +230,12 @@ do_once <- function(n_sim = 2e2) {
     # TODO: check
     # one_dimensional = TRUE, constrain_step = TRUE,
     maxit = 1e2, 
-    # cvtmle = TRUE,
+    cvtmle = FALSE,
     convergence_type = "scaled_var",
-    # delta_epsilon = 1e-2,
+    delta_epsilon = 1e-2,
     fit_method = "l2",
-    clipping = 1e-2,
-    use_best = TRUE
+    use_best = TRUE,
+    verbose=FALSE
   )
   targeted_likelihood <- Targeted_Likelihood$new(initial_likelihood, updater = up)
   tmle_params <- survival_spec$make_params(tmle_task, targeted_likelihood)
