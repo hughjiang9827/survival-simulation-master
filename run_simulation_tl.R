@@ -46,26 +46,6 @@ table(df_metric$id_mcmc)
 save(df_metric, file = "Moss-simulation-master/code_simulation/df_metric.rda")
 
 
-perf <- df_metric[t!=1,list(mean_est=mean(estimate),
-                        true_surv=mean(true_surv),
-                        mse = mean((estimate-true_surv)^2),
-                        mse_se = sd((estimate-true_surv)^2)/sqrt(.N),
-                        bias = mean(estimate-true_surv),
-                        bias2 = mean(estimate-true_surv)^2,
-                        var = var(estimate),
-                        mean_n_t = mean(n_t),
-                        n_sim = .N,
-                        EED = mean(abs(ED)),
-                        EED2 = mean(ED2)),by=list(method,t)]
-
-
-ggplot(perf,aes(x=t,y=mse,color=method))+geom_line()
-ggplot(perf,aes(x=t,y=n_sim))+geom_line()
-
-long <- melt(perf,id=c("method","t","true_surv"),measure=c("mse","bias2","var"))
-ggplot(long[t<=10],aes(x=t,y=value/true_surv^2,color=variable))+geom_line()+facet_wrap(~method)
-
-
 # shut down for memory
 # closeCluster(cl)
 # mpi.quit()

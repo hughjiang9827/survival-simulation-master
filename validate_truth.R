@@ -1,5 +1,7 @@
-source(here("moss-simulation-master/code_simulation/simulate_data.R"))
+library(here)
 library(devtools)
+source(here("moss-simulation-master/code_simulation/simulate_data.R"))
+
 load_all(here("MOSS"))
 test <- simulate_data(n_sim = 1e6)
 k_grid <- 1:10
